@@ -13,7 +13,7 @@ const rgb_address = 0xc4>>1;
  * Custom blocks
  */
 //% weight=20 color=#0fbc11 icon="▀"
-namespace I2C_LCD1602 {
+namespace grove_rgb_backlight {
     let i2c_address: number // 0x3F: PCF8574A, 0x27: PCF8574
     let backlight_control: number      // backlight control
     let RS: number      // command/data
