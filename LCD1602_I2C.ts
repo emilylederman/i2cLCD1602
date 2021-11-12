@@ -7,6 +7,8 @@ const enum Backlight {
     on = 8,
     off = 0,
 }
+const lcd_address = 0x7c>>1;
+const rgb_address = 0xc4>>1;
 /**
  * Custom blocks
  */
@@ -148,7 +150,7 @@ namespace I2C_LCD1602 {
     //% weight=81 blockGap=8
     //% parts=LCD1602_I2C trackArgs=0
     export function on(): void {
-        send_command(0x0C)
+        send_command(0x04)
     }
 
     /**
@@ -158,7 +160,7 @@ namespace I2C_LCD1602 {
     //% weight=80 blockGap=8
     //% parts=LCD1602_I2C trackArgs=0
     export function off(): void {
-        send_command(0x08)
+        send_command(0x00)
     }
 
     /**
