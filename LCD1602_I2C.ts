@@ -76,14 +76,15 @@ namespace I2C_LCD1602 {
 
     /**
      * initial LCD, set I2C address. Address is 39/63 for PCF8574/PCF8574A
-     * @param Addr is i2c address for LCD, eg: 0, 39, 63. 0 is auto find address
+     * @param address is i2c address for LCD, eg: 0, 39, 63. 0 is auto find address
      */
-    //% blockId="I2C_LCD1620_SET_ADDRESS" block="LCD initialize with Address %addr"
+    //% blockId="I2C_LCD1620_SET_ADDRESS" block="Initialize LCD with address %addr"
     //% weight=100 blockGap=8
+    //% address.defl=39
     //% parts=LCD1602_I2C trackArgs=0
-    export function LcdInit(Addr: number) {
-        if (Addr == 0) {i2c_address = AutoAddr()}
-        else {i2c_address = Addr}
+    export function LcdInit(address: number) {
+        if (address == 0) {i2c_address = AutoAddr()}
+        else {i2c_address = address}
         backlight_control = Backlight.on
         RS = 0
         send_command(0x33)       // set 4bit mode
