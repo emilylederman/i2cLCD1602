@@ -3,43 +3,46 @@
 * From microbit/micropython Chinese community.
 * http://www.micropython.org.cn
 */
-
+const enum Backlight {
+    on = 8,
+    off = 0,
+}
 /**
  * Custom blocks
  */
 //% weight=20 color=#0fbc11 icon="▀"
 namespace I2C_LCD1602 {
-    let i2cAddr: number // 0x3F: PCF8574A, 0x27: PCF8574
-    let BK: number      // backlight control
+    let i2c_address: number // 0x3F: PCF8574A, 0x27: PCF8574
+    let backlight_control: number      // backlight control
     let RS: number      // command/data
 
     // set LCD reg
     function setreg(d: number) {
-        pins.i2cWriteNumber(i2cAddr, d, NumberFormat.Int8LE)
+        pins.i2cWriteNumber(i2c_address, d, NumberFormat.Int8LE)
         basic.pause(1)
     }
 
     // send data to I2C bus
-    function set(d: number) {
+    function send_data_to_I2c_bus(d: number): void {
         d = d & 0xF0
-        d = d + BK + RS
+        d = d + backlight_control + RS
         setreg(d)
         setreg(d + 4)
         setreg(d)
     }
 
     // send command
-    function cmd(d: number) {
+    function send_command(d: number) {
         RS = 0
-        set(d)
-        set(d << 4)
+        send_data_to_I2c_bus(d)
+        send_data_to_I2c_bus(d << 4)
     }
 
     // send data
-    function dat(d: number) {
+    function send_data(d: number) {
         RS = 1
-        set(d)
-        set(d << 4)
+        send_data_to_I2c_bus(d)
+        send_data_to_I2c_bus(d << 4)
     }
 
     // auto get LCD address
@@ -79,20 +82,20 @@ namespace I2C_LCD1602 {
     //% weight=100 blockGap=8
     //% parts=LCD1602_I2C trackArgs=0
     export function LcdInit(Addr: number) {
-        if (Addr == 0) i2cAddr = AutoAddr()
-        else i2cAddr = Addr
-        BK = 8
+        if (Addr == 0) {i2c_address = AutoAddr()}
+        else {i2c_address = Addr}
+        backlight_control = Backlight.on
         RS = 0
-        cmd(0x33)       // set 4bit mode
+        send_command(0x33)       // set 4bit mode
         basic.pause(5)
-        set(0x30)
+        send_data_to_I2c_bus(0x30)
         basic.pause(5)
-        set(0x20)
+        send_data_to_I2c_bus(0x20)
         basic.pause(5)
-        cmd(0x28)       // set mode
-        cmd(0x0C)
-        cmd(0x06)
-        cmd(0x01)       // clear
+        send_command(0x28)       // set mode
+        send_command(0x0C)
+        send_command(0x06)
+        send_command(0x01)       // clear
     }
 
     /**
@@ -130,10 +133,10 @@ namespace I2C_LCD1602 {
         else
             a = 0x80
         a += x
-        cmd(a)
+        send_command(a)
 
         for (let i = 0; i < s.length; i++) {
-            dat(s.charCodeAt(i))
+            send_data(s.charCodeAt(i))
         }
     }
 
@@ -144,7 +147,7 @@ namespace I2C_LCD1602 {
     //% weight=81 blockGap=8
     //% parts=LCD1602_I2C trackArgs=0
     export function on(): void {
-        cmd(0x0C)
+        send_command(0x0C)
     }
 
     /**
@@ -154,7 +157,7 @@ namespace I2C_LCD1602 {
     //% weight=80 blockGap=8
     //% parts=LCD1602_I2C trackArgs=0
     export function off(): void {
-        cmd(0x08)
+        send_command(0x08)
     }
 
     /**
@@ -164,7 +167,7 @@ namespace I2C_LCD1602 {
     //% weight=85 blockGap=8
     //% parts=LCD1602_I2C trackArgs=0
     export function clear(): void {
-        cmd(0x01)
+        send_command(0x01)
     }
 
     /**
@@ -174,8 +177,8 @@ namespace I2C_LCD1602 {
     //% weight=71 blockGap=8
     //% parts=LCD1602_I2C trackArgs=0
     export function BacklightOn(): void {
-        BK = 8
-        cmd(0)
+        backlight_control = Backlight.on
+        send_command(0)
     }
 
     /**
@@ -185,27 +188,7 @@ namespace I2C_LCD1602 {
     //% weight=70 blockGap=8
     //% parts=LCD1602_I2C trackArgs=0
     export function BacklightOff(): void {
-        BK = 0
-        cmd(0)
-    }
-
-    /**
-     * shift left
-     */
-    //% blockId="I2C_LCD1620_SHL" block="Shift Left"
-    //% weight=61 blockGap=8
-    //% parts=LCD1602_I2C trackArgs=0
-    export function shl(): void {
-        cmd(0x18)
-    }
-
-    /**
-     * shift right
-     */
-    //% blockId="I2C_LCD1620_SHR" block="Shift Right"
-    //% weight=60 blockGap=8
-    //% parts=LCD1602_I2C trackArgs=0
-    export function shr(): void {
-        cmd(0x1C)
-    }
+        backlight_control = Backlight.off
+        send_command(0)
+    } 
 }
